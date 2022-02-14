@@ -5,16 +5,35 @@ var temp=$("#temp");
 var wind=$("#wind");
 var humidity=$("#humidity");
 var uvi=$("#uvi");
+let cityArray = [];
+//getCities();
+//searchWeather($("#recentsearches").val());
 
-document.getElementById("search").addEventListener("click", function(event){
+// Banner date
+var today = moment();
+$("#currentDay").text(today.format("dddd, MMMM Do YYYY"));
+
+$("#searchBtn").on("click", function (event) {
     event.preventDefault();
-    var citySelect = document.getElementById('city').value;
-    console.log(citySelect);
+    var city = $("#userData").val();
+    //get the textbox value
+    if (city === "") {
+        console.log("type in something");
+    } else {
+       console.log(city);
+        saveCities();
+     }
+
+})
+document.getElementById("city").addEventListener("click", function(event){
+    event.preventDefault();
+    var citySelect = document.getElementById("city".value);
+    console.log("city".value);
     console.log("search button clicked");
 });
 
 document.addEventListener("DOMContentLoaded", function(event) { 
-   getLatLong("Atlanta");
+   getLatLong("Chicago");
   });
 
   function getLatLong (city) {
@@ -39,7 +58,7 @@ fetch(queryURL)
 .then(function(response){
     response.json().then(function(data) {
         console.log(data);
-    $(date).html(currentDate);
+    //$(date).html(currentDate);
     $(temp).html(data.current.temp); 
     $(wind).html(data.current.wind_speed); 
     $(humidity).html(data.current.humidity); 
@@ -55,6 +74,19 @@ fetch(queryURL)
         $("#humidity"+i).html(dayData.humidity);
 
     }
-    
-    })
+  })
 })}
+
+if(uvi<=2){
+    $(this).addClass('favorable');
+} else if(uvi>2 && uvi<8){
+    $(this).addClass('moderate');
+} else if(uvi>8){
+    $(this).addClass('severe');
+}
+
+function saveCities(city) {
+    // const exists = Boolean(keywordsArray.find(x => keywords));
+   cityArray.unshift(city);
+    localStorage.setItem("CityArray", JSON.stringify(citiesArray));
+}

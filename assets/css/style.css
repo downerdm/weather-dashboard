@@ -8,3 +8,19 @@ h1 {
 #pastSearchButton {
     margin: 2px;
 }
+
+.favorable {
+    background: green;
+    color: white;
+}
+
+.moderate {
+    background: yellow;
+    color: black;
+}
+
+.severe {
+    background: red;
+    color: white;
+}
+
