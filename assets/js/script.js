@@ -6,12 +6,10 @@ var wind=$("#wind");
 var humidity=$("#humidity");
 var uvi=$("#uvi");
 let cityArray = [];
-//getCities();
 //searchWeather($("#recentsearches").val());
 
 // Banner date
 var today = moment();
-$("#currentDay").text(today.format("dddd, MMMM Do YYYY"));
 
 $("#searchBtn").on("click", function (event) {
     event.preventDefault();
@@ -21,32 +19,23 @@ $("#searchBtn").on("click", function (event) {
         console.log("type in something");
     } else {
        console.log(city);
-        saveCities();
-     }
+       getLatLong(city);
+       }
 
 })
-document.getElementById("city").addEventListener("click", function(event){
-    event.preventDefault();
-    var citySelect = document.getElementById("city".value);
-    console.log("city".value);
-    console.log("search button clicked");
-});
-
-document.addEventListener("DOMContentLoaded", function(event) { 
-   getLatLong("Chicago");
-  });
 
   function getLatLong (city) {
     var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+ city + "&appid=" + apiKey;
     fetch(queryURL)
     .then(function(response){
-        
-        
         response.json().then(function(data) {
+            $("#displayCity").html(data.name+" ("+today.format("dddd, MMMM Do YYYY")+") "+
+            "<img src=https://openweathermap.org/img/wn/" + data.weather[0].icon + ".png>");
         console.log(data);
         var lat=data.coord.lat;
         var long=data.coord.lon;  
         getWeatherData(lat,long);
+        saveCities(data.name);
         })
     })
 }
@@ -62,8 +51,15 @@ fetch(queryURL)
     $(temp).html(data.current.temp); 
     $(wind).html(data.current.wind_speed); 
     $(humidity).html(data.current.humidity); 
-    $(uvi).html(data.current.uvi); 
-    for (i=0; i<5; i++){
+    $(uvi).html(data.current.uvi);
+        if(data.current.uvi<=2){
+            uvi.addClass('favorable');
+        } else if(data.current.uvi>2 && data.current.uvi<8){
+            uvi.addClass('moderate');
+        } else if(data.current.uvi>8){
+            uvi.addClass('severe');
+        }
+        for (i=0; i<5; i++){
         var dayData = data.daily[i];
         var currentDate = new Date(dayData.dt*1000).toLocaleDateString();
         var icon = "https://openweathermap.org/img/wn/" + dayData.weather[0].icon + ".png";
@@ -77,16 +73,17 @@ fetch(queryURL)
   })
 })}
 
-if(uvi<=2){
-    $(this).addClass('favorable');
-} else if(uvi>2 && uvi<8){
-    $(this).addClass('moderate');
-} else if(uvi>8){
-    $(this).addClass('severe');
+function saveCities(city) {
+    var b = $("<button>");
+    $(b).text(city);
+    console.log($(b));
+    $(".btn-group-vertical").prepend(b);
+    var x = document.createElement("BUTTON");
+    x.value=city;
+    console.log(x);
+    cityArray.unshift(city);
+    localStorage.setItem("cityArray", JSON.stringify(cityArray));
 }
 
-function saveCities(city) {
-    // const exists = Boolean(keywordsArray.find(x => keywords));
-   cityArray.unshift(city);
-    localStorage.setItem("CityArray", JSON.stringify(citiesArray));
-}
+
+//block15.val(localStorage.getItem("block15"));
